@@ -1,4 +1,5 @@
 import gym
+import numpy as np
 
 from .game import QuartoGame, QuartoPiece
 
@@ -15,7 +16,7 @@ class QuartoEnv(gym.Env):
 
         self.reset()
 
-    def reset(selfi, random_start=True):
+    def reset(self, random_start=True):
         self.game = QuartoGame()
         self.turns = 0
         self.piece = None

@@ -5,7 +5,7 @@ class QuartoGame(object):
         self.board = [[None for i in range(4)] for i in range(4)]
         self.free = [QuartoPiece(i) for i in range(16)]
 
-    def play(self, piece, position) -> boolean:
+    def play(self, piece, position) -> bool:
         # check if piece in self.free
         if piece not in self.free:
             return False
