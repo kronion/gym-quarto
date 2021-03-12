@@ -18,6 +18,7 @@ class QuartoGame(object):
         # remove from free
         self.free.remove(piece)
 
+    @property
     def game_over(self):
         for i in range(4):
             if QuartoGame.common(self.board[i][0], self.board[i][1], self.board[i][2], self.board[i][3]):

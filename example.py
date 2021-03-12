@@ -1,6 +1,9 @@
 from gym_quarto import QuartoEnv
+from stable_baselines3.common.env_checker import check_env
 
 env = QuartoEnv()
+
+check_env(env)
 
 NB_EPISODE = 1
 for episode in range(NB_EPISODE):
