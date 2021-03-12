@@ -54,6 +54,9 @@ class QuartoEnv(gym.Env):
     def done(self):
         return self.game.game_over
 
+    def render(self):
+        pass
+
     @classmethod
     def pieceNum(klass, piece):
         if piece is None:
@@ -73,8 +76,8 @@ class OnePlayerQuartoEnv(QuartoEnv):
     """ We emulate the second player so that each step is seen from the same player
     """
     def __init__(self, other_player):
-        super(OnePlayerQuartoEnv, self).__init__(self)
         self.other_player = other_player
+        super(OnePlayerQuartoEnv, self).__init__()
 
     def reset(self):
         super(OnePlayerQuartoEnv, self).reset()

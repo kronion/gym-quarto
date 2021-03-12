@@ -1,7 +1,10 @@
-from gym_quarto import QuartoEnv
+import random
+
 from stable_baselines3.common.env_checker import check_env
 
-env = QuartoEnv()
+from gym_quarto import QuartoEnv, OnePlayerQuartoEnv, RandomPlayer, random_action
+
+env = OnePlayerQuartoEnv(RandomPlayer())
 
 check_env(env)
 
@@ -10,10 +13,10 @@ for episode in range(NB_EPISODE):
     env.reset()
     done = False
     while not done:
-        action = stuff
+        action = random_action(env.game)
         obs, reward, done, info = env.step(action)
-        print(f"{info['turn']: <4} | ")
-        env.render(fps=0.5)
+        #print(f"{info['turn']: <4} | ")
+        env.render()
     print("done")
 env.close()
 
