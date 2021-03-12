@@ -1,5 +1,6 @@
 import gym
 import numpy as np
+import random
 
 from .game import QuartoGame, QuartoPiece
 
@@ -43,3 +44,25 @@ class QuartoEnv(gym.Env):
     @property
     def done(self):
         return self.game.game_over
+
+class OnePlayerQuartoEnv(QuartoEnv):
+    """ We emulate the second player so that each step is seen from the same player
+    """
+    def __init__(self, other_player):
+        super(OnePlayerQuartoEnv, self).__init__(self)
+        self.other_player = other_player
+
+    def reset(self):
+        super(OnePlayerQuartoEnv, self).reset()
+        self.other_player.reset(self.game)
+        self.other_first = random.choice([True, False])
+        if self.other_first:
+            # Make the first step now
+
+    def step(self, action):
+        obs, rew, done, info = super(OnePlayerQuartoEnv, self).step(action)
+        if not done:
+            # Let other play
+            action = self.other_player.step()
+            obs, _, done, _ = super(OnePlayerQuartoEnv, self).step(action)
+        return obs, rew, done, info
