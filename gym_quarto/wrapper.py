@@ -10,20 +10,23 @@ class OnePlayerWrapper(Wrapper):
         self.other_player = other_player
 
     def reset(self):
-        super(OnePlayerWrapper, self).reset()
+        obs = super(OnePlayerWrapper, self).reset()
         self.other_player.reset(self.game)
         self.other_first = random.choice([True, False])
         if self.other_first:
             # Make the first step now
-            action = self.other_player.step()
+            action = self.other_player.step(obs)
             obs, _, done, _ = self.env.step(action)
 
         return self.observation
 
     def step(self, action):
-        obs, rew, done, info = self.env.step(action)
-        if not done:
-            # Let other play
-            action = self.other_player.step()
-            obs, _, done, _ = self.env.step(action)
-        return obs, rew, done, info
+        obs, self_rew, done, info = self.env.step(action)
+        self.render()
+        if done:
+            return obs, self_rew, done, info
+        # Let other play
+        action = self.other_player.step(obs)
+        obs, rew, done, _ = self.env.step(action)
+        # If the second terminated the game, give negative reward to the agent
+        return obs, -rew if done else self_rew, done, info

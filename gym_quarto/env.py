@@ -1,22 +1,24 @@
 import gym
+import logging
 import numpy as np
 import random
 
 from .game import QuartoGame, QuartoPiece
 
+logger = logging.getLogger(__name__)
+
 class QuartoEnv(gym.Env):
-    EMPTY = -1
+    EMPTY = 0
     metadata = {'render.modes':['terminal']}
 
     def __init__(self):
         super(QuartoEnv, self).__init__()
 
         # action is [pos, next]
-        self.action_space = gym.spaces.Box(
-                low =self.EMPTY, high=15, shape=(2,), dtype=np.int8)
+        self.action_space = gym.spaces.MultiDiscrete([17, 16])
 
-        self.observation_space = gym.spaces.Box(
-            low = self.EMPTY, high=15, shape=(17,), dtype=np.int8)
+        # next piece + board (flatten) 
+        self.observation_space = gym.spaces.MultiDiscrete([17] * (1+4*4))
 
         self.reset()
 
@@ -24,19 +26,28 @@ class QuartoEnv(gym.Env):
         self.game = QuartoGame()
         self.turns = 0
         self.piece = None
+        self.broken = False
         return self.observation
 
     def step(self, action):
         reward = 0
         info = {}
-        assert not self.done
+        if self.done:
+            logger.warn("Actually already done")
+            return self.observation, reward, self.done, info
         
         position, next = action
-        valid = self.game.play(self.piece, (position % 4, position // 4))
-        if valid:
-            pass                                  
+        valid = True
+        if self.turns != 0:
+            # Don't play on the first turn
+            valid = self.game.play(self.piece, (position % 4, position // 4))
+        if not valid:
+            reward = -200
+            self.broken = True
+        elif self.game.game_over:
+            reward = 100 + 16 - self.turns
         self.piece = QuartoPiece(next)
-
+        self.turns += 1
         return self.observation, reward, self.done, info
 
     @property
@@ -52,10 +63,19 @@ class QuartoEnv(gym.Env):
 
     @property
     def done(self):
-        return self.game.game_over
+        return self.broken or self.game.game_over
 
     def render(self, mode, **kwargs):
-        pass
+        for row in self.game.board:
+            s = ""
+            for piece in row:
+                if piece is None:
+                    s += ". "
+                else:
+                    s += str(piece) + " "
+            print(s)
+        print(f"Next: {self.piece}, Free: {''.join(str(p) for p in self.game.free)}")
+        print()
 
     @classmethod
     def pieceNum(klass, piece):
@@ -70,4 +90,4 @@ class QuartoEnv(gym.Env):
             res += 4
         if piece.round:
             res += 8
-        return res
+        return res+1 # empty = 0
