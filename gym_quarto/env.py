@@ -15,7 +15,7 @@ class QuartoEnv(gym.Env):
         super(QuartoEnv, self).__init__()
 
         # action is [pos, next]
-        self.action_space = gym.spaces.MultiDiscrete([17, 16])
+        self.action_space = gym.spaces.MultiDiscrete([16, 16])
 
         # next piece + board (flatten) 
         self.observation_space = gym.spaces.MultiDiscrete([17] * (1+4*4))
@@ -35,18 +35,26 @@ class QuartoEnv(gym.Env):
         if self.done:
             logger.warn("Actually already done")
             return self.observation, reward, self.done, info
-        
+
         position, next = action
-        valid = True
-        if self.turns != 0:
-            # Don't play on the first turn
+        logger.debug(f"Received: position: {position}, next: {next}")
+
+        # Process the position
+        if self.piece is not None:
+            # Don't play on the first turn, just save the next piece
             valid = self.game.play(self.piece, (position % 4, position // 4))
-        if not valid:
-            reward = -200
-            self.broken = True
-        elif self.game.game_over:
-            reward = 100 + 16 - self.turns
-        self.piece = QuartoPiece(next)
+            if not valid:
+                # Invalid move
+                reward = -200
+                self.broken = True
+            elif self.game.game_over:
+                # We just won !
+                reward = 100 + 16 - self.turns
+
+        # Process the next piece
+        self.piece = QuartoPiece(next + 1)
+
+        # Turn done
         self.turns += 1
         return self.observation, reward, self.done, info
 

@@ -15,6 +15,7 @@ class QuartoGame(object):
             return False
         # check if position free
         x, y = position
+        logger.debug(f"Willing to play at ({x}, {y})")
         if self.board[y][x] != None:
             logger.warn(f"Not on a free spot {self.board[y][x]} at {x}, {y}")
             return False
