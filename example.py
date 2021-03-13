@@ -2,9 +2,10 @@ import random
 
 from stable_baselines3.common.env_checker import check_env
 
-from gym_quarto import QuartoEnv, OnePlayerQuartoEnv, RandomPlayer, random_action
+from gym_quarto import QuartoEnv, OnePlayerWrapper, RandomPlayer, random_action
 
-env = OnePlayerQuartoEnv(RandomPlayer())
+env = QuartoEnv()
+env = OnePlayerWrapper(env, RandomPlayer())
 
 check_env(env)
 

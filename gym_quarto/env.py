@@ -54,7 +54,7 @@ class QuartoEnv(gym.Env):
     def done(self):
         return self.game.game_over
 
-    def render(self):
+    def render(self, mode, **kwargs):
         pass
 
     @classmethod
@@ -71,29 +71,3 @@ class QuartoEnv(gym.Env):
         if piece.round:
             res += 8
         return res
-
-class OnePlayerQuartoEnv(QuartoEnv):
-    """ We emulate the second player so that each step is seen from the same player
-    """
-    def __init__(self, other_player):
-        self.other_player = other_player
-        super(OnePlayerQuartoEnv, self).__init__()
-
-    def reset(self):
-        super(OnePlayerQuartoEnv, self).reset()
-        self.other_player.reset(self.game)
-        self.other_first = random.choice([True, False])
-        if self.other_first:
-            # Make the first step now
-            action = self.other_player.step()
-            obs, _, done, _ = super(OnePlayerQuartoEnv, self).step(action)
-
-        return self.observation
-
-    def step(self, action):
-        obs, rew, done, info = super(OnePlayerQuartoEnv, self).step(action)
-        if not done:
-            # Let other play
-            action = self.other_player.step()
-            obs, _, done, _ = super(OnePlayerQuartoEnv, self).step(action)
-        return obs, rew, done, info
