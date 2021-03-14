@@ -17,7 +17,7 @@ def random_action(game, buf_next):
     """ Random free piece, random free spot
     """
     if buf_next != 0:
-        buf_next = QuartoPiece(buf_next)
+        buf_next = QuartoPiece(buf_next - 1)
     if len(game.free) > 1:
         while True:
             next = random.choice(game.free)

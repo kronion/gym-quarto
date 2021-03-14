@@ -6,7 +6,7 @@ class QuartoGame(object):
 
     def __init__(self):
         self.board = [[None for i in range(4)] for i in range(4)]
-        self.free = [QuartoPiece(i+1) for i in range(16)]
+        self.free = [QuartoPiece(i) for i in range(16)]
 
     def play(self, piece, position) -> bool:
         # check if piece in self.free
@@ -63,8 +63,6 @@ class QuartoPiece(object):
     """ A piece in the game of quarto
     """
     def __init__(self, number):
-        assert number != 0
-        number -= 1
         self.big = bool(number & 0x1)
         self.hole = bool(number & 0x2)
         self.black = bool(number & 0x4)

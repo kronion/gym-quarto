@@ -15,6 +15,7 @@ class QuartoEnv(gym.Env):
         super(QuartoEnv, self).__init__()
 
         # action is [pos, next]
+        # both are not null, they are just ignored when irrelevant
         self.action_space = gym.spaces.MultiDiscrete([16, 16])
 
         # next piece + board (flatten) 
@@ -50,9 +51,12 @@ class QuartoEnv(gym.Env):
             elif self.game.game_over:
                 # We just won !
                 reward = 100 + 16 - self.turns
+            else:
+                # We managed to play something valid
+                reward = 5
 
         # Process the next piece
-        self.piece = QuartoPiece(next + 1)
+        self.piece = QuartoPiece(next)
 
         # Turn done
         self.turns += 1
@@ -65,8 +69,14 @@ class QuartoEnv(gym.Env):
         board = []
         for row in self.game.board:
             for piece in row:
-                board.append(QuartoEnv.pieceNum(piece))
-        piece = [QuartoEnv.pieceNum(self.piece)]
+                if piece is None:
+                    board.append(self.EMPTY)
+                else:
+                    board.append(QuartoEnv.pieceNum(piece) + 1)
+        if self.piece is None:
+            piece = [self.EMPTY]
+        else :
+            piece = [QuartoEnv.pieceNum(self.piece) + 1]
         return np.concatenate((piece, board)).astype(np.int8)
 
     @property
@@ -87,8 +97,6 @@ class QuartoEnv(gym.Env):
 
     @classmethod
     def pieceNum(klass, piece):
-        if piece is None:
-            return klass.EMPTY
         res = 0
         if piece.big:
             res += 1
@@ -98,4 +106,7 @@ class QuartoEnv(gym.Env):
             res += 4
         if piece.round:
             res += 8
-        return res+1 # empty = 0
+        return res
+
+    def __del__(self):
+        self.close()
