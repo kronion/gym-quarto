@@ -3,6 +3,8 @@ import logging
 import numpy as np
 import random
 
+from gym.envs.registration import register
+
 from .game import QuartoGame, QuartoPiece
 
 logger = logging.getLogger(__name__)
@@ -110,3 +112,9 @@ class QuartoEnv(gym.Env):
 
     def __del__(self):
         self.close()
+
+register(
+    id='quarto-v0',
+    entry_point='gym_quarto.env:QuartoEnv',
+    max_episode_steps=16,
+)

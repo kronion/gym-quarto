@@ -1,6 +1,7 @@
 import random
 
 from gym import Wrapper
+from gym.envs.registration import register
 
 class OnePlayerWrapper(Wrapper):
     """ We emulate the second player so that each step is seen from the same player
@@ -30,3 +31,18 @@ class OnePlayerWrapper(Wrapper):
         obs, rew, done, _ = self.env.step(action)
         # If the second terminated the game, give negative reward to the agent
         return obs, -rew if done else self_rew, done, info
+
+    def seed(self, seed):
+        random.seed(seed)
+
+def make_env():
+    from .env import QuartoEnv
+    from .player import RandomPlayer
+    env = QuartoEnv()
+    env = OnePlayerWrapper(env, RandomPlayer())
+
+register(
+    id="1PQuarto-v0",
+    entry_point="gym_quarto.wrapper:make_env",
+    max_episode_steps=8,
+)
