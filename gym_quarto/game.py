@@ -8,7 +8,7 @@ class QuartoGame(object):
         self.board = [[None for i in range(4)] for i in range(4)]
         self.free = [QuartoPiece(i) for i in range(16)]
 
-    def play(self, piece, position) -> bool:
+    def play(self, piece, position, next_piece) -> bool:
         # check if piece in self.free
         if piece not in self.free:
             logger.warn(f"Not placing a free piece, {piece}, {''.join(str(p) for p in self.free)}")
@@ -23,6 +23,9 @@ class QuartoGame(object):
         self.board[y][x] = piece
         # remove from free
         self.free.remove(piece)
+        if not self.game_over and next_piece not in self.free:
+            logger.warn(f"Next piece invalid, {next_piece}, {''.join(str(p) for p in self.free)}")
+            return False
         return True
 
     @property

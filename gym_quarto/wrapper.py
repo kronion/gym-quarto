@@ -40,6 +40,7 @@ def make_env():
     from .player import RandomPlayer
     env = QuartoEnv()
     env = OnePlayerWrapper(env, RandomPlayer())
+    return env
 
 register(
     id="1PQuarto-v0",
