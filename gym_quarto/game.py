@@ -45,6 +45,15 @@ class QuartoGame(object):
             return True
         return False
 
+    @property
+    def draw(self):
+        for row in self.board:
+            if None in row:
+                # Free spot: no draw
+                return False
+        # No free spot, no win: draw
+        return not self.game_over
+
 
     @staticmethod
     def common(a, b, c, d):

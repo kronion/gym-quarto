@@ -53,6 +53,8 @@ class QuartoEnv(gym.Env):
             elif self.game.game_over:
                 # We just won !
                 reward = 100 + 16 - self.turns
+            elif self.game.draw:
+                reward = 50
             else:
                 # We managed to play something valid
                 reward = 5
@@ -83,7 +85,7 @@ class QuartoEnv(gym.Env):
 
     @property
     def done(self):
-        return self.broken or self.game.game_over
+        return self.broken or self.game.game_over or self.game.draw
 
     def render(self, mode, **kwargs):
         for row in self.game.board:
