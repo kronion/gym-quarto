@@ -23,8 +23,10 @@ def random_action(game, buf_next):
             next = random.choice(game.free)
             if next != buf_next:
                 break
+        next = QuartoEnv.pieceNum(next)
     else:
         next = None
+    
     while True:
         x = random.randrange(4)
         y = random.randrange(4)
@@ -32,4 +34,4 @@ def random_action(game, buf_next):
             break
 
     logger.info(f"Playing random at ({x}, {y}), next: {next}")
-    return x + y * 4, QuartoEnv.pieceNum(next)
+    return x + y * 4, next
