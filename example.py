@@ -14,7 +14,7 @@ def make_env():
     env = OnePlayerWrapper(env, RandomPlayer())
     return env
 
-#check_env(env)
+check_env(make_env())
 
 def random_vs_random():
     env = make_env()
@@ -52,4 +52,20 @@ def a2c():
         env.render()
     print("done")
 
-a2c()
+def random_vs_human():
+    env = make_env()
+    NB_EPISODE = 1
+    for episode in range(NB_EPISODE):
+        obs = env.reset()
+        env.render()
+        done = False
+        while not done:
+            print("Your turn:")
+            position = int(input("Where do you play? "))
+            next_piece = int(input("Your next piece? "))
+            obs, reward, done, info = env.step((position, next_piece))
+            print(f"{info['turn']: <4} | Reward: {reward: >4}")
+            env.render()
+        print("done")
+
+random_vs_random()

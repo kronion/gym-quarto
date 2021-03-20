@@ -41,11 +41,13 @@ class QuartoEnv(gym.Env):
 
         position, next = action
         logger.debug(f"Received: position: {position}, next: {next}")
+        if next is not None:
+            next = QuartoPiece(next)
 
         # Process the position
         if self.piece is not None:
             # Don't play on the first turn, just save the next piece
-            valid = self.game.play(self.piece, (position % 4, position // 4), QuartoPiece(next))
+            valid = self.game.play(self.piece, (position % 4, position // 4), next)
             if not valid:
                 # Invalid move
                 reward = -200
@@ -60,7 +62,7 @@ class QuartoEnv(gym.Env):
                 reward = 5
 
         # Process the next piece
-        self.piece = QuartoPiece(next)
+        self.piece = next
 
         # Turn done
         self.turns += 1
