@@ -5,16 +5,16 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3 import A2C
 
-from gym_quarto import QuartoEnv, OnePlayerWrapper, RandomPlayer, random_action
+from gym_quarto import QuartoEnv, OnePlayerWrapper, RandomPlayer, HumanPlayer, random_action
 
 logging.basicConfig(level=logging.INFO)
 
-def make_env():
+def make_env(player=RandomPlayer()):
     env = QuartoEnv()
-    env = OnePlayerWrapper(env, RandomPlayer())
+    env = OnePlayerWrapper(env, player)
     return env
 
-check_env(make_env())
+#check_env(make_env())
 
 def random_vs_random():
     env = make_env()
@@ -29,43 +29,42 @@ def random_vs_random():
             env.render()
         print("done")
     
-def a2c():
-    env = make_env()
-    model = A2C('MlpPolicy', env, verbose = 1)
+def a2c(path):
+    env = make_env(HumanPlayer())
 
-    eval_env = make_env()
-    mean, std = evaluate_policy(model, eval_env, n_eval_episodes=10)
-    s = f"before learning mean={mean:.2f} +/- {std}"
+    eval_env = make_env(RandomPlayer())
 
-    model.learn(total_timesteps=10_000_000)
+
+    model= A2C.load(path, env, verbose=1)
 
     mean, std = evaluate_policy(model, eval_env, n_eval_episodes=10)
-    print(s)
-    print(f"after learning mean={mean:.2f} +/- {std}")
+    print(f"Loaded policy: mean={mean:.2f} +/- {std}")
     # Show how well we learned by plating a game:
     obs = env.reset()
     done = False
     while not done:
         action, _state = model.predict(obs)
         obs, reward, done, info = env.step(action)
-        #print(f"{info['turn']: <4} | ")
+        print(f"{info['turn']: <4} | Reward: {reward: >4} | {info['winner']}")
         env.render()
     print("done")
 
+import sys
+a2c(sys.argv[1])
+
 def random_vs_human():
     env = make_env()
+    human = HumanPlayer()
     NB_EPISODE = 1
     for episode in range(NB_EPISODE):
         obs = env.reset()
         env.render()
         done = False
         while not done:
-            print("Your turn:")
-            position = int(input("Where do you play? "))
-            next_piece = int(input("Your next piece? "))
-            obs, reward, done, info = env.step((position, next_piece))
+            action, _state = human.predict(obs)
+            obs, reward, done, info = env.step(action)
             print(f"{info['turn']: <4} | Reward: {reward: >4}")
             env.render()
         print("done")
 
-random_vs_random()
+#random_vs_random()

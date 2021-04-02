@@ -106,3 +106,4 @@ class QuartoPiece(object):
             (True, True, True, False): 'g',
             (True, True, True, True): 'h',
         }[self.big, self.hole, self.black, self.round]
+

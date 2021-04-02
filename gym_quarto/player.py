@@ -1,6 +1,8 @@
 import logging
 import random
 
+from stable_baselines3 import A2C
+
 from .env import QuartoEnv
 from .game import QuartoPiece
 
@@ -10,8 +12,11 @@ class RandomPlayer:
     def reset(self, game):
         self.game = game
 
-    def step(self, obs):
-        return random_action(self.game, obs[0])
+    def predict(self, obs):
+        return random_action(self.game, obs[0]), None
+
+    def seed(self, seed):
+        random.seed(seed)
 
 def random_action(game, buf_next):
     """ Random free piece, random free spot
@@ -23,9 +28,10 @@ def random_action(game, buf_next):
             next = random.choice(game.free)
             if next != buf_next:
                 break
-        next = QuartoEnv.pieceNum(next)
+        next_p = QuartoEnv.pieceNum(next)
     else:
         next = None
+        next_p = None
     
     while True:
         x = random.randrange(4)
@@ -34,4 +40,33 @@ def random_action(game, buf_next):
             break
 
     logger.info(f"Playing random at ({x}, {y}), next: {next}")
-    return x + y * 4, next
+    return x + y * 4, next_p
+
+class A2CPlayer:
+    def __init__(self, model_path, env):
+        self.model = A2C.load(model_path, env)
+
+    def reset(self, game):
+        pass
+
+    def predict(self, obs):
+        return self.model.predict(obs)
+
+    def seed(self, seed):
+        pass
+
+class HumanPlayer:
+    def reset(self, game):
+        print("Reseting game")
+
+    def predict(self, obs):
+        print("Your turn:")
+        position = input("Where do you play? ")
+        position = int(position[0]) + int(position[1]) * 4
+        next_piece = input("Your next piece? ")
+        next_piece = QuartoEnv.pieceFromStr(next_piece)
+        return (position, next_piece), None
+
+    def seed(self, seed):
+        pass
+

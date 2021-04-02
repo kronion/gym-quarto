@@ -34,7 +34,11 @@ class QuartoEnv(gym.Env):
 
     def step(self, action):
         reward = 0
-        info = {}
+        self.turns += 1
+        info = {'turn': self.turns,
+                'invalid': False,
+                'win': False,
+                'draw': False}
         if self.done:
             logger.warn("Actually already done")
             return self.observation, reward, self.done, info
@@ -52,21 +56,22 @@ class QuartoEnv(gym.Env):
                 # Invalid move
                 reward = -200
                 self.broken = True
+                info['invalid'] = True
             elif self.game.game_over:
                 # We just won !
-                reward = 100 + 16 - self.turns
+                reward = 100
+                info['win'] = True
             elif self.game.draw:
-                reward = 50
+                reward = 20
+                info['draw'] = True
             else:
                 # We managed to play something valid
-                reward = 5
+                reward = 0
 
         # Process the next piece
         self.piece = next
 
-        # Turn done
-        self.turns += 1
-        return self.observation, reward, self.done, {'turn': self.turns}
+        return self.observation, reward, self.done, info
 
     @property
     def observation(self):
@@ -101,8 +106,8 @@ class QuartoEnv(gym.Env):
         print(f"Next: {self.piece}, Free: {''.join(str(p) for p in self.game.free)}")
         print()
 
-    @classmethod
-    def pieceNum(klass, piece):
+    @staticmethod
+    def pieceNum(piece):
         res = 0
         if piece.big:
             res += 1
@@ -113,6 +118,13 @@ class QuartoEnv(gym.Env):
         if piece.round:
             res += 8
         return res
+
+    @staticmethod
+    def pieceFromStr(s):
+        for i in range(16):
+            if str(QuartoPiece(i)) == s:
+                return i
+        return None
 
     def __del__(self):
         self.close()

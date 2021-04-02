@@ -16,7 +16,7 @@ class OnePlayerWrapper(Wrapper):
         self.other_first = random.choice([True, False])
         if self.other_first:
             # Make the first step now
-            action = self.other_player.step(obs)
+            action, _ = self.other_player.predict(obs)
             obs, _, done, _ = self.env.step(action)
 
         return self.observation
@@ -25,21 +25,36 @@ class OnePlayerWrapper(Wrapper):
         obs, self_rew, done, info = self.env.step(action)
         self.render()
         if done:
+            info['winner'] = 'Agent'
             return obs, self_rew, done, info
         # Let other play
-        action = self.other_player.step(obs)
-        obs, rew, done, _ = self.env.step(action)
-        # If the second terminated the game, give negative reward to the agent
-        return obs, -rew if done else self_rew, done, info
+        action, _state = self.other_player.predict(obs)
+        obs, rew, done, info = self.env.step(action)
+        if done:
+            if info['draw']:
+                # Same reward for both
+                reward = rew
+                info['winner'] = 'Draw'
+            else:
+                # If the second won the game, give negative reward to the agent
+                reward = -rew
+                info['winner'] = 'Env'
+        else:
+            reward = self_rew
+            info['winner'] = None
+        return obs, reward, done, info
 
     def seed(self, seed):
-        random.seed(seed)
+        self.other_player.seed(seed)
+        return [seed]
 
 def make_env():
     from .env import QuartoEnv
-    from .player import RandomPlayer
+    from .player import RandomPlayer, A2CPlayer
     env = QuartoEnv()
-    env = OnePlayerWrapper(env, RandomPlayer())
+    #player = A2CPlayer('/home/ben/ML/quarto-gym/1PQuarto-v0.zip', env)
+    player = RandomPlayer()
+    env = OnePlayerWrapper(env, player)
     return env
 
 register(
