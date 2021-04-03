@@ -13,17 +13,8 @@ class QuartoEnv(gym.Env):
     EMPTY = 0
     metadata = {'render.modes':['terminal']}
 
-    def __init__(self):
-        super(QuartoEnv, self).__init__()
-
-        # action is [pos, next]
-        # both are not null, they are just ignored when irrelevant
-        self.action_space = gym.spaces.MultiDiscrete([16, 16])
-
-        # next piece + board (flatten) 
-        self.observation_space = gym.spaces.MultiDiscrete([17] * (1+4*4))
-
-        self.reset()
+    action_space = None
+    observation_space = None
 
     def reset(self, random_start=True):
         self.game = QuartoGame()
@@ -45,13 +36,11 @@ class QuartoEnv(gym.Env):
 
         position, next = action
         logger.debug(f"Received: position: {position}, next: {next}")
-        if next is not None:
-            next = QuartoPiece(next)
 
         # Process the position
         if self.piece is not None:
             # Don't play on the first turn, just save the next piece
-            valid = self.game.play(self.piece, (position % 4, position // 4), next)
+            valid = self.game.play(self.piece, position, next)
             if not valid:
                 # Invalid move
                 reward = -200
@@ -77,18 +66,7 @@ class QuartoEnv(gym.Env):
     def observation(self):
         """ game board + next piece
         """
-        board = []
-        for row in self.game.board:
-            for piece in row:
-                if piece is None:
-                    board.append(self.EMPTY)
-                else:
-                    board.append(QuartoEnv.pieceNum(piece) + 1)
-        if self.piece is None:
-            piece = [self.EMPTY]
-        else :
-            piece = [QuartoEnv.pieceNum(self.piece) + 1]
-        return np.concatenate((piece, board)).astype(np.int8)
+        return (self.game.board, self.piece)
 
     @property
     def done(self):
@@ -129,8 +107,46 @@ class QuartoEnv(gym.Env):
     def __del__(self):
         self.close()
 
+class QuartoEnvV0(QuartoEnv):
+    """ The encoding that were used by the v0 of the env
+    That's a subclass and not a wrapper.
+    """
+
+    def __init__(self):
+        super(QuartoEnvV0, self).__init__()
+
+        # next piece + board (flatten) 
+        self.observation_space = gym.spaces.MultiDiscrete([17] * (1+4*4))
+        
+        # action is [pos, next]
+        # both are not null, they are just ignored when irrelevant
+        self.action_space = gym.spaces.MultiDiscrete([16, 16])
+
+    def step(self, action):
+        position, next = action
+        if next is not None:
+            next = QuartoPiece(next)
+        position = (position % 4, position // 4)
+        return super(QuartoEnvV0, self).step((position, next))
+
+    @property
+    def observation(self):
+        board = []
+        for row in self.game.board:
+            for piece in row:
+                if piece is None:
+                    board.append(self.EMPTY)
+                else:
+                    board.append(QuartoEnv.pieceNum(piece) + 1)
+        if self.piece is None:
+            piece = [self.EMPTY]
+        else :
+            piece = [QuartoEnv.pieceNum(self.piece) + 1]
+        return np.concatenate((piece, board)).astype(np.int8)
+
+
 register(
     id='quarto-v0',
-    entry_point='gym_quarto.env:QuartoEnv',
+    entry_point='gym_quarto.env:QuartoEnvV0',
     max_episode_steps=16,
 )

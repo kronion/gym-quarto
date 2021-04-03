@@ -5,16 +5,16 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3 import A2C
 
-from gym_quarto import QuartoEnv, OnePlayerWrapper, RandomPlayer, HumanPlayer, random_action
+from gym_quarto import QuartoEnvV0, OnePlayerWrapper, RandomPlayer, HumanPlayer, random_action
 
 logging.basicConfig(level=logging.INFO)
 
 def make_env(player=RandomPlayer()):
-    env = QuartoEnv()
+    env = QuartoEnvV0()
     env = OnePlayerWrapper(env, player)
     return env
 
-#check_env(make_env())
+check_env(make_env())
 
 def random_vs_random():
     env = make_env()
