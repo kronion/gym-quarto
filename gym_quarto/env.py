@@ -84,6 +84,15 @@ class QuartoEnv(gym.Env):
         print(f"Next: {self.piece}, Free: {''.join(str(p) for p in self.game.free)}")
         print()
 
+    @property
+    def legal_actions(self):
+        for position in self.game.free_spots:
+            for piece in self.game.free:
+                if piece == self.piece:
+                    continue
+                yield position, piece
+
+
     @staticmethod
     def pieceNum(piece):
         res = 0
@@ -143,6 +152,12 @@ class QuartoEnvV0(QuartoEnv):
         else :
             piece = [QuartoEnv.pieceNum(self.piece) + 1]
         return np.concatenate((piece, board)).astype(np.int8)
+
+    @property
+    def legal_actions(self):
+        for position, piece in super(QuartoEnvV0, self).legal_actions:
+            x, y = position
+            yield x+y*4, QuartoEnv.pieceNum(piece)
 
 
 register(

@@ -47,6 +47,8 @@ class QuartoGame(object):
 
     @property
     def draw(self):
+        """ Game is finished but no one won
+        """
         for row in self.board:
             if None in row:
                 # Free spot: no draw
@@ -54,9 +56,18 @@ class QuartoGame(object):
         # No free spot, no win: draw
         return not self.game_over
 
+    @property
+    def free_spots(self):
+        for y, row in enumerate(self.board):
+            for x, spot in enumerate(row):
+                if spot is None:
+                    yield x, y
+
 
     @staticmethod
     def common(a, b, c, d):
+        """ The four piece have a common property
+        """
         if None in (a, b, c, d):
             return False
         if a.big == b.big == c.big == d.big:
