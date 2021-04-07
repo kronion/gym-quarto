@@ -26,7 +26,7 @@ def random_vs_random():
         obs = env.reset()
         done = False
         while not done:
-            action = random_action(env.game, obs[0])
+            action = random.choice(list(env.legal_actions))
             obs, reward, done, info = env.step(action)
             #print(f"{info['turn']: <4} | ")
             env.render()
@@ -53,7 +53,7 @@ def a2c(path):
     print("done")
 
 import sys
-a2c(sys.argv[1])
+#a2c(sys.argv[1])
 
 def random_vs_human():
     env = make_env()
@@ -70,4 +70,4 @@ def random_vs_human():
             env.render()
         print("done")
 
-#random_vs_random()
+random_vs_random()

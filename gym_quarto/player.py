@@ -17,7 +17,7 @@ class RandomPlayer:
         pass
 
     def predict(self, obs):
-        possible_actions = [a for a in self.env.legal_actions]
+        possible_actions = list(self.env.legal_actions)
         return random.choice(possible_actions), None
 
     def seed(self, seed):
