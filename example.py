@@ -1,6 +1,7 @@
 import logging
 import random
 
+import gym
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3 import A2C
@@ -9,8 +10,10 @@ from gym_quarto import QuartoEnvV0, OnePlayerWrapper, RandomPlayer, HumanPlayer,
 
 logging.basicConfig(level=logging.INFO)
 
-def make_env(player=RandomPlayer()):
-    env = QuartoEnvV0()
+def make_env(player=None):
+    env = gym.make('quarto-v1')
+    if player is None:
+        player = RandomPlayer(env)
     env = OnePlayerWrapper(env, player)
     return env
 

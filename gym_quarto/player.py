@@ -9,11 +9,16 @@ from .game import QuartoPiece
 logger = logging.getLogger(__name__)
 
 class RandomPlayer:
-    def reset(self, game):
-        self.game = game
+    def __init__(self, env):
+        assert isinstance(env.unwrapped, QuartoEnv), env
+        self.env = env
+
+    def reset(self, env):
+        pass
 
     def predict(self, obs):
-        return random_action(self.game, obs[0]), None
+        possible_actions = [a for a in self.env.legal_actions]
+        return random.choice(possible_actions), None
 
     def seed(self, seed):
         random.seed(seed)

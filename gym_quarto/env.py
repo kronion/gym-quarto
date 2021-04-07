@@ -3,8 +3,6 @@ import logging
 import numpy as np
 import random
 
-from gym.envs.registration import register
-
 from .game import QuartoGame, QuartoPiece
 
 logger = logging.getLogger(__name__)
@@ -159,9 +157,3 @@ class QuartoEnvV0(QuartoEnv):
             x, y = position
             yield x+y*4, QuartoEnv.pieceNum(piece)
 
-
-register(
-    id='quarto-v0',
-    entry_point='gym_quarto.env:QuartoEnvV0',
-    max_episode_steps=16,
-)
