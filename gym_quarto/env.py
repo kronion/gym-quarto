@@ -19,7 +19,7 @@ class QuartoEnv(gym.Env):
         self.turns = 0
         self.piece = None
         self.broken = False
-        return self.observation
+        return self._observation
 
     def step(self, action):
         reward = 0
@@ -30,7 +30,7 @@ class QuartoEnv(gym.Env):
                 'draw': False}
         if self.done:
             logger.warn("Actually already done")
-            return self.observation, reward, self.done, info
+            return self._observation, reward, self.done, info
 
         position, next = action
         logger.debug(f"Received: position: {position}, next: {next}")
@@ -58,10 +58,10 @@ class QuartoEnv(gym.Env):
         # Process the next piece
         self.piece = next
 
-        return self.observation, reward, self.done, info
+        return self._observation, reward, self.done, info
 
     @property
-    def observation(self):
+    def _observation(self):
         """ game board + next piece
         """
         return (self.game.board, self.piece)

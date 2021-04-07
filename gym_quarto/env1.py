@@ -2,6 +2,8 @@ import numpy as np
 
 import gym
 
+from .game import QuartoPiece
+
 
 class MoveEncoding(gym.ActionWrapper):
     """Move Encoding Wrapping
@@ -18,16 +20,16 @@ class MoveEncoding(gym.ActionWrapper):
 
     @property
     def legal_actions(self):
-        for action in self.legal_actions:
+        for action in self.env.legal_actions:
             yield self.encode(action)
 
     def decode(self, action):
         position = (action[0], action[1])
         piece = QuartoPiece(
-                x[2] * 1 + 
-                x[3] * 2 + 
-                x[4] * 4 + 
-                x[5] * 8)
+                action[2] * 1 +
+                action[3] * 2 +
+                action[4] * 4 +
+                action[5] * 8)
         return position, piece
 
     def encode(self, move):
@@ -65,7 +67,6 @@ class BoardEncoding(gym.ObservationWrapper):
         )
 
     def observation(self, obs):
-        print('called')
         board, piece = obs
 
         res = np.zeros(
@@ -85,6 +86,4 @@ class BoardEncoding(gym.ObservationWrapper):
             res[:, :, 6] = int(piece.hole)
             res[:, :, 7] = int(piece.black)
             res[:, :, 8] = int(piece.round)
-        assert isinstance(res, np.ndarray)
-        #print(f"returned {res}")
         return res

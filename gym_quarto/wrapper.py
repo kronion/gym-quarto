@@ -11,7 +11,7 @@ class OnePlayerWrapper(Wrapper):
         self.other_player = other_player
 
     def reset(self):
-        obs = super(OnePlayerWrapper, self).reset()
+        obs = self.env.reset()
         self.other_player.reset(self.game)
         self.other_first = random.choice([True, False])
         if self.other_first:
@@ -19,7 +19,7 @@ class OnePlayerWrapper(Wrapper):
             action, _ = self.other_player.predict(obs)
             obs, _, done, _ = self.env.step(action)
 
-        return self.observation
+        return obs
 
     def step(self, action):
         obs, self_rew, done, info = self.env.step(action)
