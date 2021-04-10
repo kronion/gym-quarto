@@ -3,6 +3,7 @@ import random
 from gym import Wrapper
 from gym.envs.registration import register
 
+
 class OnePlayerWrapper(Wrapper):
     """ We emulate the second player so that each step is seen from the same player
     """
@@ -23,7 +24,7 @@ class OnePlayerWrapper(Wrapper):
 
     def step(self, action):
         obs, self_rew, done, info = self.env.step(action)
-        self.render()
+        # self.render()
         if done:
             info['winner'] = 'Agent'
             return obs, self_rew, done, info
@@ -48,6 +49,7 @@ class OnePlayerWrapper(Wrapper):
         self.other_player.seed(seed)
         return [seed]
 
+
 def make_env():
     from .env import QuartoEnv
     from .player import RandomPlayer, A2CPlayer
@@ -56,6 +58,7 @@ def make_env():
     player = RandomPlayer()
     env = OnePlayerWrapper(env, player)
     return env
+
 
 register(
     id="1PQuarto-v0",

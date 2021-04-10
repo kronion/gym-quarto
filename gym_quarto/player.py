@@ -8,6 +8,7 @@ from .game import QuartoPiece
 
 logger = logging.getLogger(__name__)
 
+
 class RandomPlayer:
     def __init__(self, env):
         assert isinstance(env.unwrapped, QuartoEnv), env
@@ -23,6 +24,7 @@ class RandomPlayer:
     def seed(self, seed):
         random.seed(seed)
 
+
 def random_action(game, buf_next):
     """ Random free piece, random free spot
     """
@@ -37,7 +39,7 @@ def random_action(game, buf_next):
     else:
         next = None
         next_p = None
-    
+
     while True:
         x = random.randrange(4)
         y = random.randrange(4)
@@ -46,6 +48,7 @@ def random_action(game, buf_next):
 
     logger.info(f"Playing random at ({x}, {y}), next: {next}")
     return x + y * 4, next_p
+
 
 class A2CPlayer:
     def __init__(self, model_path, env):
@@ -59,6 +62,7 @@ class A2CPlayer:
 
     def seed(self, seed):
         pass
+
 
 class HumanPlayer:
     def reset(self, game):
@@ -74,4 +78,3 @@ class HumanPlayer:
 
     def seed(self, seed):
         pass
-
