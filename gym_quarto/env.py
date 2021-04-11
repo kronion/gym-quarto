@@ -52,7 +52,7 @@ class QuartoEnv(gym.Env):
                 info["draw"] = True
             else:
                 # We managed to play something valid
-                reward = 1
+                reward = 0
 
         # Process the next piece
         self.piece = next
