@@ -15,14 +15,12 @@ class QuartoGame(object):
             # logger.warn(
             #     f"Not placing a free piece, {piece}, {''.join(str(p) for p in self.free)}"
             # )
-            breakpoint()
             return False
         # check if position free
         x, y = position
         logger.debug(f"Willing to play at ({x}, {y})")
         if self.board[x][y] is not None:
             # logger.warn(f"Not on a free spot {self.board[x][y]} at {x}, {y}")
-            breakpoint()
             return False
         # position piece
         self.board[x][y] = piece
@@ -32,7 +30,6 @@ class QuartoGame(object):
             # logger.warn(
             #     f"Next piece invalid, {next_piece}, {''.join(str(p) for p in self.free)}"
             # )
-            breakpoint()
             return False
 
         return True
