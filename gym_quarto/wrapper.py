@@ -13,7 +13,7 @@ class OnePlayerWrapper(Wrapper):
 
     def reset(self):
         obs = self.env.reset()
-        self.other_player.reset(self.game)
+        # self.other_player.reset(self.game)
         self.other_first = random.choice([True, False])
         if self.other_first:
             # Make the first step now
