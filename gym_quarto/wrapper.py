@@ -26,13 +26,20 @@ class OnePlayerWrapper(Wrapper):
         obs, self_rew, done, info = self.env.step(action)
         # self.render()
         if done:
-            info['winner'] = 'Agent'
+            if info["invalid"]:
+                info["winner"] = "Env"
+            else:
+                info['winner'] = 'Agent'
             return obs, self_rew, done, info
         # Let other play
         action, _state = self.other_player.predict(obs)
         obs, rew, done, info = self.env.step(action)
         if done:
-            if info['draw']:
+            if info["invalid"]:
+                # If the second lost by disqualification, don't reward the first agent
+                info["winner"] = "Agent"
+                reward = 0
+            elif info['draw']:
                 # Same reward for both
                 reward = rew
                 info['winner'] = 'Draw'
