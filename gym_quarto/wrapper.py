@@ -53,6 +53,7 @@ class OnePlayerWrapper(Wrapper):
         return obs, reward, done, info
 
     def seed(self, seed):
+        random.seed(seed)
         self.other_player.seed(seed)
         return [seed]
 

@@ -1,5 +1,4 @@
 import logging
-from itertools import chain
 
 import gym
 import numpy as np
@@ -61,12 +60,11 @@ class QuartoEnv(gym.Env):
 
     @property
     def _observation(self):
-        """ game board + next piece
         """
-        flattened_board = list(chain.from_iterable(self.game.board))
-        flattened_board = [i.number if i is not None else 16 for i in flattened_board]
-        piece = [self.piece.number if self.piece is not None else 16]
-        return np.array(flattened_board + piece)
+        game board + next piece
+        """
+
+        return (self.game.board, self.piece)
 
     @property
     def done(self):
